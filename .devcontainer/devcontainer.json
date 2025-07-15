@@ -1,0 +1,39 @@
+
+//Archivo principal de configuración que le dice a VSCode:
+// Que use docker-compose.yml para levantar los servicios.
+// Que el contenedor principal es app.
+// Qué extensiones instalar automáticamente (PHP, MySQL, Prettier, etc.).
+// Que se abran los puertos 8080 (para ver la app web) y 3306 (para MySQL).
+
+
+{
+    "name": "PHP & MySQL",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash",
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "php.suggest.basic": false,
+                "editor.formatOnSave": true
+            },
+            "extensions": [
+                "felixfbecker.php-debug",
+                "bmewburn.vscode-intelephense-client",
+                "esbenp.prettier-vscode",
+                "vivaxy.vscode-conventional-commits",
+                "cweijan.vscode-mysql-client2"
+            ]
+        }
+    },
+    "forwardPorts": [
+        8081,
+        3306
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers-extra/features/composer:1": {}
+    }
+}

@@ -1,0 +1,25 @@
+# Define dos contenedores:
+# app: El que ejecuta PHP.
+# db: El que ejecuta MySQL con la base de datos llamada php_pdo.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:db
+
+  db:
+    image: mysql:8.4.3
+    restart: unless-stopped
+    volumes:
+      - mysql-pdo-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: taller_api
+
+volumes:
+  mysql-pdo-data:
