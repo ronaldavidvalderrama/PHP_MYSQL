@@ -55,6 +55,58 @@ switch ($metodo) {
         }
         break;
 
+case 'POST':
+    // REALIZAR INSERCIONES
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if ($recurso === 'categorias') {
+        $stmt = $pdo->prepare('INSERT INTO categorias (nombre) VALUES (?)');
+        $stmt->execute([
+            $data['nombre']
+        ]);
+        http_response_code(201); // Código de estado 201 para creación exitosa
+        $data['id'] = $pdo->lastInsertId();
+        echo json_encode([
+            'message' => 'Categoría creada con exito',
+            'categoria' => $data
+        ]);
+    } elseif ($recurso === 'productos') {
+        $stmt = $pdo->prepare('INSERT INTO productos (nombre, precio, categoria_id) VALUES (?, ?, ?)');
+        $stmt->execute([
+            $data['nombre'],
+            $data['precio'],
+            $data['categoria_id']
+        ]);
+        http_response_code(201);
+        $data['id'] = $pdo->lastInsertId();
+        echo json_encode([
+            'message' => 'Producto creado con exito',
+            'producto' => $data
+        ]);
+    } elseif ($recurso === 'promociones') {
+        $stmt = $pdo->prepare('INSERT INTO promociones (descripcion, descuento, producto_id) VALUES (?, ?, ?)');
+        $stmt->execute([
+            $data['descripcion'],
+            $data['descuento'],
+            $data['producto_id']
+        ]);
+        http_response_code(201);
+        $data['id'] = $pdo->lastInsertId();
+        echo json_encode([
+            'message' => 'promocion creado con exito',
+            'producto' => $data
+        ]);
+    } else {
+        http_response_code(404);
+        echo json_encode([
+            'Error' => 'Recurso no encontrado',
+            'code' => 404
+        ]);
+    }
+
+    break;
+
+    
 
 
 }
