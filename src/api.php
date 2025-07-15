@@ -41,10 +41,35 @@ switch ($metodo) {
             $response = $stmt->fetchAll(PDO::FETCH_ASSOC);  
             echo json_encode($response, JSON_PRETTY_PRINT);
         } elseif ($recurso === 'promociones') {
-            $stmt = $pdo->prepare("SELECT id, descripcion, descuento, producto_id FROM promociones");
-            $stmt->execute();
-            $response = $stmt->fetchAll(PDO::FETCH_ASSOC);  
-            echo json_encode($response, JSON_PRETTY_PRINT);
+            if ($id === 'mayores-a-20') {
+                // Productos con promociones mayores al 20%
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        p.id AS producto_id,
+                        p.nombre AS producto,
+                        p.precio,
+                        c.nombre AS categoria,
+                        promo.descripcion,
+                        promo.descuento
+                    FROM productos p
+                    JOIN categorias c ON p.categoria_id = c.id
+                    JOIN promociones promo ON promo.producto_id = p.id
+                    WHERE promo.descuento > 20
+                ");
+                $stmt->execute();
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                http_response_code(200);
+                echo json_encode($result, JSON_PRETTY_PRINT);
+            } else {
+                // Listar todas las promociones
+                $stmt = $pdo->prepare("SELECT id, descripcion, descuento, producto_id FROM promociones");
+                $stmt->execute();
+                $response = $stmt->fetchAll(PDO::FETCH_ASSOC);  
+
+                http_response_code(200);
+                echo json_encode($response, JSON_PRETTY_PRINT);
+            }
         } else {
             http_response_code(404);
             echo json_encode([
@@ -54,6 +79,7 @@ switch ($metodo) {
             ]);
         }
         break;
+
 
 case 'POST':
     // REALIZAR INSERCIONES
