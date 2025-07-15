@@ -169,7 +169,122 @@ case 'PUT':
     break;
 
 
+case 'DELETE':
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode([
+            'Error' => 'ID no especificado',
+            'code' => 400,
+            'errorurl' => 'https://http.cat/images/400.jpg'
+        ]);
+        exit;
+    }
 
+    if ($recurso === 'categorias') {
+        // Verificar si la categoria existe
+        $stmt = $pdo->prepare('SELECT * FROM categorias WHERE id = ?');
+        $stmt->execute([$id]);
+        $categoria = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$categoria) {
+            http_response_code(404);
+            echo json_encode([
+                'Error' => 'Categoria no encontrada',
+                'code' => 404
+            ]);
+            exit;
+        }
+
+        // Verificar si tiene productos asociados
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM productos WHERE categoria_id = ?');
+        $stmt->execute([$id]);
+        if ($stmt->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode([
+                'Error' => 'No se puede eliminar la categoria porque tiene productos asociados',
+                'code' => 409
+            ]);
+            exit;
+        }
+
+        // Eliminar categoria
+        $stmt = $pdo->prepare('DELETE FROM categorias WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode([
+            'message' => 'Categoria eliminada con exito',
+            'categoria' => $categoria
+        ]);
+    }
+
+    elseif ($recurso === 'productos') {
+        // Verificar si el producto existe
+        $stmt = $pdo->prepare('SELECT * FROM productos WHERE id = ?');
+        $stmt->execute([$id]);
+        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$producto) {
+            http_response_code(404);
+            echo json_encode([
+                'Error' => 'Producto no encontrado',
+                'code' => 404
+            ]);
+            exit;
+        }
+
+        // Verificar si tiene promociones asociadas
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM promociones WHERE producto_id = ?');
+        $stmt->execute([$id]);
+        if ($stmt->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode([
+                'Error' => 'No se puede eliminar el producto porque tiene promociones asociadas',
+                'code' => 409
+            ]);
+            exit;
+        }
+
+        // Eliminar producto
+        $stmt = $pdo->prepare('DELETE FROM productos WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode([
+            'message' => 'Producto eliminado con exito',
+            'producto' => $producto
+        ]);
+    }
+
+    elseif ($recurso === 'promociones') {
+        // Verificar si la promocion existe
+        $stmt = $pdo->prepare('SELECT * FROM promociones WHERE id = ?');
+        $stmt->execute([$id]);
+        $promocion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$promocion) {
+            http_response_code(404);
+            echo json_encode([
+                'Error' => 'Promocion no encontrada',
+                'code' => 404
+            ]);
+            exit;
+        }
+
+        // Eliminar promocion
+        $stmt = $pdo->prepare('DELETE FROM promociones WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode([
+            'message' => 'Promocion eliminada con exito',
+            'promocion' => $promocion
+        ]);
+    }
+
+    else {
+        http_response_code(404);
+        echo json_encode([
+            'Error' => 'Recurso no encontrado',
+            'code' => 404
+        ]);
+    }
+
+    break;
 
 }
 
