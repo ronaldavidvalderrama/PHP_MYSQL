@@ -107,6 +107,68 @@ case 'POST':
     break;
 
     
+case 'PUT':
+    // REALIZAR ACTUALIZACIONES
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode([
+            'Error' => 'ID no especificado',
+            'code' => 400,
+            'errorurl' => 'https://http.cat/images/400.jpg'
+        ]);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if ($recurso === 'categorias') {
+        $stmt = $pdo->prepare('UPDATE categorias SET nombre = ? WHERE id = ?');
+        $stmt->execute([
+            $data['nombre'],
+            $id
+        ]);
+        http_response_code(200);
+        echo json_encode([
+            'message' => 'Categoria actualizada con exito',
+            'categoria' => $data
+        ]);
+    } elseif ($recurso === 'productos') {
+        $stmt = $pdo->prepare('UPDATE productos SET nombre = ?, precio = ?, categoria_id = ? WHERE id = ?');
+        $stmt->execute([
+            $data['nombre'],
+            $data['precio'],
+            $data['categoria_id'],
+            $id
+        ]);
+        http_response_code(200);
+        echo json_encode([
+            'message' => 'Producto actualizado con exito',
+            'producto' => $data
+        ]);
+    } elseif ($recurso === 'promociones') {
+        $stmt = $pdo->prepare('UPDATE promociones SET descripcion = ?, descuento = ?, producto_id = ? WHERE id = ?');
+        $stmt->execute([
+            $data['descripcion'],
+            $data['descuento'],
+            $data['producto_id'],
+            $id
+        ]);
+        http_response_code(200);
+        echo json_encode([
+            'message' => 'promocion actualizada con exito',
+            'producto' => $data
+        ]);
+    } else {
+        http_response_code(404);
+        echo json_encode([
+            'Error' => 'Recurso no encontrado',
+            'code' => 404
+        ]);
+    }
+
+    break;
+
+
 
 
 }
